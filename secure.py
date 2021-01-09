@@ -3,17 +3,18 @@ from bs4 import BeautifulSoup
 
 
 class Secure:
-    _MY_JLUZH_DOMAIN = 'https://my.jluzh.edu.cn/_web/fusionportal/index.jsp?_p=YXM9MSZwPTEmbT1OJg__'  # 参数p未知
+    _WORK_JLUZH_DOMAIN = 'https://work.jluzh.edu.cn/'  # 任意选取CAS的一个服务作为登录
     _JLUZH_CAS_DOMAIN = 'https://authserver.jluzh.edu.cn/cas/login'
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
 
-    def login_my(self, session):
-        """登录我的吉珠"""
-        execution = self.get_execution(self._MY_JLUZH_DOMAIN)
-        r = requests.post(self._JLUZH_CAS_DOMAIN, data={
+    def login(self, session):
+        """使当前会话通过CAS登录，之后所有通过CAS认证的服务都将会自动认证"""
+        execution = self.get_execution(self._WORK_JLUZH_DOMAIN)
+
+        session.post(self._JLUZH_CAS_DOMAIN, data={
             "username": self.username,
             "password": self.password,
             "execution": execution,
@@ -33,18 +34,7 @@ class Secure:
             "accept-encoding": "gzip, deflate, br",
             "accept-language": "zh-CN,zh;q=0.9",
             "content-type": "application/x-www-form-urlencoded",
-        }, allow_redirects=False)
-
-        url_with_ticket = r.headers['Location']  # 目标平台带ticket参数地址
-
-        print(url_with_ticket)
-
-        target_cookie = session.get(url_with_ticket, headers={
-            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, '
-                          'like Gecko) Chrome/47.0.2526.80 Safari/537.36'
-        }).headers['Set-Cookie']  # 通过登录目标平台，获取Cookie
-
-        return target_cookie
+        })
 
     def get_execution(self, service):
         """获取CAS页面的execution字段"""
