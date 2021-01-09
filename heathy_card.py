@@ -6,11 +6,14 @@ class Card:
     _HEALTHY_CARD_PRESET_DICT_PATH = 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryEmp.biz.ext'
 
     def __init__(self, session):
-        r = session.post(self._HEALTHY_CARD_PRESET_DICT_PATH, headers={
-            'referer': 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/jkxxcj.jsp'
-        })
+        self._SESSION = session
+
+        r = session.post(self._HEALTHY_CARD_PRESET_DICT_PATH)
 
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
+
+        self._get_today_submit()
+
         print(resp_dict)
 
         self._CLASS_NAME = resp_dict['result']['bjmc']  # 班级名称 '计算机学院xxxx级xx班'
@@ -63,16 +66,17 @@ class Card:
             "cn": [
                 "本人承诺登记后、到校前不再前往其他地区"
             ],  # 承诺
-            "bz": "", # 备注
+            "bz": "",  # 备注
             "_ext": "{}",
             "__type": "sdo:com.sudytech.work.jlzh.jkxxtb.jkxxcj.TJlzhJkxxtb"
         }
 
-        print({'entity': post_dict})
-
         # 如果今天填过健康卡，附带一个实体ID，更新实体
-        if True:
-            post_dict['id'] = -1
+        today_submit_id = self._get_today_submit_id()
+        if today_submit_id:
+            post_dict['id'] = today_submit_id
+
+        print({'entity': post_dict})
 
     def get_user_info(self, session):
         r = session.get(
@@ -85,6 +89,29 @@ class Card:
         self._ORG_NAME = resp_dict['result']['ORGNAME']  # 学院名称
         self._USER_REAL_NAME = resp_dict['result']['EMPNAME']  # 用户真实姓名
         self._USER_STUDENT_ID = resp_dict['result']['EMPCODE']  # 用户学号
+
+    def _get_today_submit_id(self):
+        try:
+            return self._get_today_submit()['TODAY_SUBMIT_ID']
+        except:
+            return None
+
+    def _get_today_submit_time(self):
+        try:
+            return self._get_today_submit()['TODAY_SUBMIT_TIME']
+        except:
+            return None
+
+    def _get_today_submit(self):
+        r = self._SESSION.post(
+            'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryToday.biz.ext')
+        resp_dict = json.loads(r.content.decode(encoding='utf-8'))
+        print('TODAY SUBMIT')
+        print(resp_dict)
+        return {
+            'TODAY_SUBMIT_ID': resp_dict['result'].get('ID', None),
+            'TODAY_SUBMIT_TIME': resp_dict['result'].get('TJSJ', 'UNKNOWN')
+        }
 
     @staticmethod
     def _get_fmt_date():

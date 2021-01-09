@@ -15,7 +15,11 @@ def main_handler(event, context):
 
         Secure(username, password).login(session)
 
+        print('---- LOGIN SUCCESS ----')
+
         card = Card(session)
+        print('---- CARD INFO INIT SUCCESS ----')
+
         card.submit()
 
 
