@@ -10,5 +10,5 @@ class Notify:
         if self.SCKEY:
             requests.get(f'https://sc.ftqq.com/{self.SCKEY}.send', params={
                 'text': title,
-                'content': content
+                'desp': content
             })

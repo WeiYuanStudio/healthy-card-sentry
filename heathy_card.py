@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 
 class Card:
@@ -123,9 +123,9 @@ class Card:
     @staticmethod
     def _get_fmt_date():
         now = datetime.now()
-        return now.strftime("%Y-%m-%d")
+        return now.astimezone(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
 
     @staticmethod
     def _get_fmt_date_time():
         now = datetime.now()
-        return now.strftime("%Y-%m-%d %H:%M")
+        return now.astimezone(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M")
