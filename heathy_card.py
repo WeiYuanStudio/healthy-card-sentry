@@ -1,34 +1,37 @@
 import json
+import os
 from datetime import datetime
 
 
 class Card:
     _HEALTHY_CARD_PRESET_DICT_PATH = 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryEmp.biz.ext'
+    _HEALTHY_CARD_POST_PATH = 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.portalone.base.db.saveOrUpdate.biz.ext'
+    _HEALTHY_CARD_QUERY_TODAY_PATH = 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryToday.biz.ext'
 
     def __init__(self, session):
         self._SESSION = session
 
-        r = session.post(self._HEALTHY_CARD_PRESET_DICT_PATH)
+        self.get_user_info()  # 获取用户个人信息
+        self._load_preset()  # 加载表单预设
+
+    def _load_preset(self):
+        r = self._SESSION.post(self._HEALTHY_CARD_PRESET_DICT_PATH)
 
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
-
-        self._get_today_submit()
 
         print(resp_dict)
 
         self._CLASS_NAME = resp_dict['result']['bjmc']  # 班级名称 '计算机学院xxxx级xx班'
         self._COUNSELOR_ID = resp_dict['result']['fdygh']  # 辅导员工号
         self._COUNSELOR_NAME = resp_dict['result']['fdymc']  # 辅导员名称
-        self._STUDENT_PHONE = resp_dict['result']['lxdh']  # 学生联系电话
+        self._STUDENT_PHONE = os.environ.get('PHONE') or resp_dict['result']['lxdh']  # 学生联系电话
         self._STUDENT_GRADE = resp_dict['result']['nj']  # 学生入学学年 第xxxx届学生
         self._USER_TYPE = resp_dict['result']['qq']  # 人员身份? 2
         self._DORM_ID = resp_dict['result']['ssh']  # 宿舍号 '榕x-xxx-x'
         self._GENDER = resp_dict['result']['xb']  # 性别ID: 男 1 | 女 2
         self._MAJOR = resp_dict['result']['zymc']  # 专业名称 '软件工程'
 
-        self._LOCATION_TYPE = '2'  # 所在地区: 珠海1 | 在广东2 | 其他地区4 Todo: 使用环境变量
-
-        self.get_user_info(session)
+        self._LOCATION_TYPE = os.environ.get('LOCATION_TYPE') or '2'  # 所在地区: 珠海1 | 在广东2 | 其他地区4 Todo: 使用环境变量
 
     def submit(self):
         # 构建提交表单的参数
@@ -50,8 +53,8 @@ class Card:
             "lxdh": self._STUDENT_PHONE,
             "tbrq": self._get_fmt_date(),
             "tjsj": self._get_fmt_date_time(),
-            "xjzdz": "广东xx市xx县",  # 常住地址 Todo: 使用环境变量
-            "jqqx": "广东xx",  # 假期期间去向 Todo: 使用环境变量
+            "xjzdz": os.environ.get('LOCATION_DETAILED') or '广东省珠海市金湾区吉林大学珠海学院',  # 常住地址 Todo: 上移到init
+            "jqqx": os.environ.get('LOCATION') or "广东省珠海市金湾区",  # 假期期间去向 Todo: 上移到init
 
             # 健康设定
             "sfqwhb": "否",  # 去往湖北
@@ -59,7 +62,7 @@ class Card:
             "sfjwhy": "否",
             "sfjwhygjdq": "",
             "xrywz": self._LOCATION_TYPE,
-            "jtdz": "在校",  # 具体地址
+            "jtdz": os.environ.get('LOCATION_DETAILED') or '广东省珠海市金湾区吉林大学珠海学院',  # 具体地址
             "grjkzk": "1",  # 健康码
             "jrtw": "36",  # 体温
             "qsjkzk": "1",  # 亲属状况
@@ -78,12 +81,13 @@ class Card:
         if today_submit_id:
             post_dict['id'] = today_submit_id
 
-        print({'entity': post_dict})
+        print("---- POST CARD DICT ----")
+        print(post_dict)
 
-        self._SESSION.post('https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.portalone.base.db.saveOrUpdate.biz.ext', json={'entity': post_dict})
+        self._SESSION.post(self._HEALTHY_CARD_POST_PATH, json={'entity': post_dict})
 
-    def get_user_info(self, session):
-        r = session.get(
+    def get_user_info(self):
+        r = self._SESSION.get(
             'https://work.jluzh.edu.cn/default/base/workflow/com.sudytech.work.jluzh_LoginUser.jluzhLogin.LoginUser.jluzhUtil.biz.ext')
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
         print(resp_dict)
@@ -100,15 +104,14 @@ class Card:
         except:
             return None
 
-    def _get_today_submit_time(self):
+    def get_today_submit_time(self):
         try:
             return self._get_today_submit()['TODAY_SUBMIT_TIME']
         except:
             return None
 
     def _get_today_submit(self):
-        r = self._SESSION.post(
-            'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryToday.biz.ext')
+        r = self._SESSION.post(self._HEALTHY_CARD_QUERY_TODAY_PATH)
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
         print('TODAY SUBMIT')
         print(resp_dict)
