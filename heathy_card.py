@@ -26,11 +26,12 @@ class Card:
         self._GENDER = resp_dict['result']['xb']  # 性别ID: 男 1 | 女 2
         self._MAJOR = resp_dict['result']['zymc']  # 专业名称 '软件工程'
 
-        self._LOCATION_TYPE = '2'  # 所在地区: 珠海1 | 在广东2 | 其他地区4
+        self._LOCATION_TYPE = '2'  # 所在地区: 珠海1 | 在广东2 | 其他地区4 Todo: 使用环境变量
 
         self.get_user_info(session)
 
     def submit(self):
+        # 构建提交表单的参数
         post_dict = {
             'sqrid': self._USER_ID,
             'sqbmid': self._ORG_ID,
@@ -49,8 +50,8 @@ class Card:
             "lxdh": self._STUDENT_PHONE,
             "tbrq": self._get_fmt_date(),
             "tjsj": self._get_fmt_date_time(),
-            "xjzdz": "广东xx市xx县",  # 常住地址
-            "jqqx": "广东xx",  # 假期期间去向
+            "xjzdz": "广东xx市xx县",  # 常住地址 Todo: 使用环境变量
+            "jqqx": "广东xx",  # 假期期间去向 Todo: 使用环境变量
 
             # 健康设定
             "sfqwhb": "否",  # 去往湖北
@@ -66,17 +67,20 @@ class Card:
             "cn": [
                 "本人承诺登记后、到校前不再前往其他地区"
             ],  # 承诺
-            "bz": "",  # 备注
+            "bz": "无",  # 备注
             "_ext": "{}",
             "__type": "sdo:com.sudytech.work.jlzh.jkxxtb.jkxxcj.TJlzhJkxxtb"
         }
 
         # 如果今天填过健康卡，附带一个实体ID，更新实体
         today_submit_id = self._get_today_submit_id()
+
         if today_submit_id:
             post_dict['id'] = today_submit_id
 
         print({'entity': post_dict})
+
+        self._SESSION.post('https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.portalone.base.db.saveOrUpdate.biz.ext', json={'entity': post_dict})
 
     def get_user_info(self, session):
         r = session.get(
