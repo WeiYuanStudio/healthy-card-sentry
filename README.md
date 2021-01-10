@@ -22,9 +22,9 @@
 
 [1.0发布版本页面](https://gitee.com/WeiYuanStudio/healthy-card-sentry/releases/v1.0)
 
-打包好的文件是`healthy-card-sentry.zip`
+打包好的文件是` healthy-card-sentry.zip`，把这个文件上传到腾讯云函数即可
 
-[![slGb60.png](https://s3.ax1x.com/2021/01/10/slGb60.png)](https://imgchr.com/i/slGb60)
+![slGb60.png](https://s3.ax1x.com/2021/01/10/slGb60.png)
 
 ### 3.完成个人设定
 
@@ -40,13 +40,13 @@
 | LOCATION_DETAILED | 当前住址                          | 广东省珠海市金湾区吉林大学珠海学院 |          |
 | SCKEY             | Server酱通知 API KEY              | 填写后执行完毕会发送状态给微信     |          |
 
-[![slGHlq.png](https://s3.ax1x.com/2021/01/10/slGHlq.png)](https://imgchr.com/i/slGHlq)
+![slGHlq.png](https://s3.ax1x.com/2021/01/10/slGHlq.png)
 
 ### 4.设定定时触发器
 
 按照图中的设定就是一小时填一次健康表
 
-[![slG7pn.png](https://s3.ax1x.com/2021/01/10/slG7pn.png)](https://imgchr.com/i/slG7pn)
+![slG7pn.png](https://s3.ax1x.com/2021/01/10/slG7pn.png)
 
 
 除此之外，当然你也可以进阶操作，自己编写cron表达式，腾讯云函数支持多个和多种触发器，你可以在创建后慢慢研究。
@@ -63,12 +63,12 @@
 
 ## 查看函数执行情况
 
-[![slGqXV.png](https://s3.ax1x.com/2021/01/10/slGqXV.png)](https://imgchr.com/i/slGqXV)
+![slGqXV.png](https://s3.ax1x.com/2021/01/10/slGqXV.png)
 
 创建完函数后你可以在函数管理点击测试，启动一次自动填报，之后你可以在日志查询看到执行日志。若在环境变量中填写了server chan的`SCKEY`的同学，你的微信将收到填报执行结果的反馈推送。
 
-[![sltYSs.jpg](https://s3.ax1x.com/2021/01/10/sltYSs.jpg)](https://imgchr.com/i/sltYSs)
-[![sltGWj.jpg](https://s3.ax1x.com/2021/01/10/sltGWj.jpg)](https://imgchr.com/i/sltGWj)
+![sltYSs.jpg](https://s3.ax1x.com/2021/01/10/sltYSs.jpg)
+![sltGWj.jpg](https://s3.ax1x.com/2021/01/10/sltGWj.jpg)
 
 ## 开发文档
 
