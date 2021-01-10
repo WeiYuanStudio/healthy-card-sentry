@@ -40,6 +40,15 @@
 | LOCATION_DETAILED | 当前住址                          | 广东省珠海市金湾区吉林大学珠海学院 |          |
 | SCKEY             | Server酱通知 API KEY              | 填写后执行完毕会发送状态给微信     |          |
 
+除了账号密码是必填项，其他的都可以不填，默认发送学校地址到健康卡。
+
+**SCKEY**是Server Chan推送消息给微信用的，Server Chan是一个开发者消息推送服务平台，[Server Chan官网](http://sc.ftqq.com/3.version)，若不需要推送执行结果通知，或者不想注册Server Chan，这个可以不填。
+
+常见错误：
+
+1. 请检查上传的ZIP包是否错误，包内含有BS4才是正确的代码包。
+2. 检查账号密码是否错误，请登录学校网站[我的吉珠](https://my.jluzh.edu.cn)检查账号是否能登录。
+
 ![slGHlq.png](https://s3.ax1x.com/2021/01/10/slGHlq.png)
 
 ### 4.设定定时触发器
@@ -65,7 +74,9 @@
 
 ![slGqXV.png](https://s3.ax1x.com/2021/01/10/slGqXV.png)
 
-创建完函数后你可以在函数管理点击测试，启动一次自动填报，之后你可以在日志查询看到执行日志。若在环境变量中填写了server chan的`SCKEY`的同学，你的微信将收到填报执行结果的反馈推送。
+创建完函数后你可以在函数管理点击测试，启动一次自动填报，之后你可以在日志查询看到执行日志。
+
+若在环境变量中填写了SCKEY而且Server Chan已经绑定了微信的`SCKEY`的同学，你的微信将收到填报执行结果的反馈推送。
 
 ![sltYSs.jpg](https://s3.ax1x.com/2021/01/10/sltYSs.jpg)
 ![sltGWj.jpg](https://s3.ax1x.com/2021/01/10/sltGWj.jpg)
