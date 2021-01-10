@@ -20,6 +20,10 @@
 
 创建一个云函数，按照上图设定。代码ZIP打包可在该仓库的Release找到
 
+[1.0发布版本页面](https://gitee.com/WeiYuanStudio/healthy-card-sentry/releases/v1.0)
+
+打包好的文件是`healthy-card-sentry.zip`
+
 [![slGb60.png](https://s3.ax1x.com/2021/01/10/slGb60.png)](https://imgchr.com/i/slGb60)
 
 ### 3.完成个人设定
