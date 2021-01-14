@@ -11,25 +11,28 @@ class Card:
     def __init__(self, session):
         self._SESSION = session
 
+        print('---- INIT USER INFO ----')
         self.get_user_info()  # 获取用户个人信息
+
+        print('---- LOAD CARD PRESET ----')
         self._load_preset()  # 加载表单预设
 
     def _load_preset(self):
         r = self._SESSION.post(self._HEALTHY_CARD_PRESET_DICT_PATH)
 
-        resp_dict = json.loads(r.content.decode(encoding='utf-8'))
+        resp_dict = json.loads(r.content.decode(encoding='utf-8'))['result']
 
         print(resp_dict)
 
-        self._CLASS_NAME = resp_dict['result']['bjmc']  # 班级名称 '计算机学院xxxx级xx班'
-        self._COUNSELOR_ID = resp_dict['result']['fdygh']  # 辅导员工号
-        self._COUNSELOR_NAME = resp_dict['result']['fdymc']  # 辅导员名称
-        self._STUDENT_PHONE = os.environ.get('PHONE') or resp_dict['result']['lxdh']  # 学生联系电话
-        self._STUDENT_GRADE = resp_dict['result']['nj']  # 学生入学学年 第xxxx届学生
-        self._USER_TYPE = resp_dict['result']['qq']  # 人员身份? 2
-        self._DORM_ID = resp_dict['result']['ssh']  # 宿舍号 '榕x-xxx-x'
-        self._GENDER = resp_dict['result']['xb']  # 性别ID: 男 1 | 女 2
-        self._MAJOR = resp_dict['result']['zymc']  # 专业名称 '软件工程'
+        self._CLASS_NAME = resp_dict.get('bjmc', None)  # 班级名称 '计算机学院xxxx级xx班'
+        self._COUNSELOR_ID = resp_dict.get('fdygh', None)  # 辅导员工号
+        self._COUNSELOR_NAME = resp_dict.get('fdymc', None)  # 辅导员名称
+        self._STUDENT_PHONE = os.environ.get('PHONE') or resp_dict['lxdh']  # 学生联系电话
+        self._STUDENT_GRADE = resp_dict.get('nj', None)  # 学生入学学年 第xxxx届学生
+        self._USER_TYPE = resp_dict['qq']  # 人员身份? 2
+        self._DORM_ID = resp_dict.get('ssh', None)  # 宿舍号 '榕x-xxx-x'
+        self._GENDER = resp_dict['xb']  # 性别ID: 男 1 | 女 2
+        self._MAJOR = resp_dict.get('zymc', None)  # 专业名称 '软件工程'
 
         self._LOCATION_TYPE = os.environ.get('LOCATION_TYPE') or '2'  # 所在地区: 珠海1 | 在广东2 | 其他地区4 Todo: 使用环境变量
 
