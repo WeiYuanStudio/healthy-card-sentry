@@ -29,7 +29,7 @@ class Card:
         self._COUNSELOR_NAME = resp_dict.get('fdymc', None)  # 辅导员名称
         self._STUDENT_PHONE = os.environ.get('PHONE') or resp_dict['lxdh']  # 学生联系电话
         self._STUDENT_GRADE = resp_dict.get('nj', None)  # 学生入学学年 第xxxx届学生
-        self._USER_TYPE = resp_dict['qq']  # 人员身份? 2
+        self._USER_TYPE = resp_dict['qq']  # 人员身份? 2 学生 | 1 教师
         self._DORM_ID = resp_dict.get('ssh', None)  # 宿舍号 '榕x-xxx-x'
         self._GENDER = resp_dict['xb']  # 性别ID: 男 1 | 女 2
         self._MAJOR = resp_dict.get('zymc', None)  # 专业名称 '软件工程'
@@ -57,7 +57,7 @@ class Card:
             "tbrq": self._get_fmt_date(),
             "tjsj": self._get_fmt_date_time(),
             "xjzdz": os.environ.get('LOCATION_DETAILED') or '广东省珠海市金湾区吉林大学珠海学院',  # 常住地址 Todo: 上移到init
-            "jqqx": os.environ.get('LOCATION') or "广东省珠海市金湾区",  # 假期期间去向 Todo: 上移到init
+            "jqqx": os.environ.get('LOCATION') or "广东省珠海市金湾区" if self._USER_TYPE != '1' else None,  # 假期期间去向，教师无该字段 Todo: 上移到init
 
             # 健康设定
             "sfqwhb": "否",  # 去往湖北
