@@ -24,7 +24,7 @@
 
 创建一个云函数，按照上图设定。代码ZIP打包可在该仓库的Release找到
 
-[1.0发布版本页面](https://gitee.com/WeiYuanStudio/healthy-card-sentry/releases/v1.0)
+[1.1.2发布版本页面](https://gitee.com/WeiYuanStudio/healthy-card-sentry/releases/v1.1.2)
 
 打包好的文件是` healthy-card-sentry.zip`，把这个文件上传到腾讯云函数即可
 
