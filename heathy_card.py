@@ -4,9 +4,9 @@ from datetime import datetime, timezone, timedelta
 
 
 class Card:
-    _HEALTHY_CARD_PRESET_DICT_PATH = 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryEmp.biz.ext'
-    _HEALTHY_CARD_POST_PATH = 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.portalone.base.db.saveOrUpdate.biz.ext'
-    _HEALTHY_CARD_QUERY_TODAY_PATH = 'https://work.jluzh.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryToday.biz.ext'
+    _HEALTHY_CARD_PRESET_DICT_PATH = 'https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryEmp.biz.ext'
+    _HEALTHY_CARD_POST_PATH = 'https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.portalone.base.db.saveOrUpdate.biz.ext'
+    _HEALTHY_CARD_QUERY_TODAY_PATH = 'https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryToday.biz.ext'
 
     def __init__(self, session):
         self._SESSION = session
@@ -91,7 +91,7 @@ class Card:
 
     def get_user_info(self):
         r = self._SESSION.get(
-            'https://work.jluzh.edu.cn/default/base/workflow/com.sudytech.work.jluzh_LoginUser.jluzhLogin.LoginUser.jluzhUtil.biz.ext')
+            'https://work.zcst.edu.cn/default/base/workflow/com.sudytech.work.jluzh_LoginUser.jluzhLogin.LoginUser.jluzhUtil.biz.ext')
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
         print(resp_dict)
 

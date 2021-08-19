@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 
 
 class Secure:
-    _WORK_JLUZH_DOMAIN = 'https://work.jluzh.edu.cn/'  # 任意选取CAS的一个服务作为登录
-    _JLUZH_CAS_DOMAIN = 'https://authserver.jluzh.edu.cn/cas/login'
+    _WORK_JLUZH_DOMAIN = 'https://work.zcst.edu.cn/'  # 任意选取CAS的一个服务作为登录
+    _JLUZH_CAS_DOMAIN = 'https://authserver.zcst.edu.cn/cas/login'
 
     def __init__(self, username, password):
         self.username = username
@@ -23,12 +23,12 @@ class Secure:
             "submit": "登 录",
         }, headers={
             "Referer": self._JLUZH_CAS_DOMAIN,
-            "Origin": "https://authserver.jluzh.edu.cn",
+            "Origin": "https://authserver.zcst.edu.cn",
             "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, '
                           'like Gecko) Chrome/47.0.2526.80 Safari/537.36',
             'Pragma': 'no-cache',
             'Cache-Control': 'max-age=0',
-            'Host': "authserver.jluzh.edu.cn",
+            'Host': "authserver.zcst.edu.cn",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,"
                       "application/signed-exchange;v=b3;q=0.9",
             "accept-encoding": "gzip, deflate, br",
