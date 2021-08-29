@@ -60,6 +60,7 @@ class Card:
             "jqqx": os.environ.get('LOCATION') or "广东省珠海市金湾区" if self._USER_TYPE != '1' else None,  # 假期期间去向，教师无该字段 Todo: 上移到init
 
             # 健康设定
+            "ymjzqk": "已完成两针接种",
             "sfqwhb": "否",  # 去往湖北
             "sfjchbjry": "否",
             "sfjwhy": "否",
