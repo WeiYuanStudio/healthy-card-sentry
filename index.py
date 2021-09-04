@@ -27,8 +27,7 @@ def main_handler(event, context):
             today_submit_time = card.get_today_submit_time()
 
             Notify().send('[OK]健康卡自动填报已执行', f'健康卡自动填报成功，从服务端查询到的最后填报时间为{today_submit_time}')
-    except Exception as e:
-        print(e)
+    except:
         Notify().send('[ERROR]健康卡自动填表发生错误', '健康卡自动填表发生错误，请到云函数平台检查执行日志，联系开发者并提供必要的错误日志')
 
 
