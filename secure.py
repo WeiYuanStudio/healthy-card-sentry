@@ -6,15 +6,22 @@ class Secure:
     _WORK_JLUZH_DOMAIN = 'https://work.zcst.edu.cn/'  # 任意选取CAS的一个服务作为登录
     _JLUZH_CAS_DOMAIN = 'https://authserver.zcst.edu.cn/cas/login'
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, session):
+        self.session = session
         self.username = username
         self.password = password
 
-    def login(self, session):
+    def login(self):
+        return self.login_by_html()
+
+    def login_by_restful(self):
+        pass
+
+    def login_by_html(self):
         """使当前会话通过CAS登录，之后所有通过CAS认证的服务都将会自动认证"""
         execution = self.get_execution(self._WORK_JLUZH_DOMAIN)
 
-        session.post(self._JLUZH_CAS_DOMAIN, data={
+        self.session.post(self._JLUZH_CAS_DOMAIN, data={
             "username": self.username,
             "password": self.password,
             "execution": execution,
@@ -35,6 +42,7 @@ class Secure:
             "accept-language": "zh-CN,zh;q=0.9",
             "content-type": "application/x-www-form-urlencoded",
         })
+        return self
 
     def get_execution(self, service):
         """获取CAS页面的execution字段"""
@@ -46,3 +54,11 @@ class Secure:
         elem = soup.find('input', attrs={"name": "execution"})
 
         return elem['value']
+
+    def test(self):
+        """Test login"""
+        if self.session is None:
+            print("Call login() first")
+            return
+        r = self.session.get("https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryEmp.biz.ext")
+        print(r.content)

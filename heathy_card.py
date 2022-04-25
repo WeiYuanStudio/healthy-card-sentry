@@ -4,114 +4,113 @@ from datetime import datetime, timezone, timedelta
 from requests import get
 
 _HEALTHY_CARD_QUERY_LOCATION_PATH = 'https://xmt.zcst.edu.cn/cms/items/区划信息'
-def get_code_from_name(name: str, level: int): 
+
+
+def get_code_from_name(name: str, level: int):
     r = get(_HEALTHY_CARD_QUERY_LOCATION_PATH, params={
         'fields': ['id', 'code'],
         'filter': json.dumps({
-            'level': { '_eq': level },
-            'name': { '_eq': name }
+            'level': {'_eq': level},
+            'name': {'_eq': name}
         })
     })
     if r.status_code != 200:
         return None
     if len(r.json()['data']) > 0:
-        return (r.json()['data'][0]['id'] ,r.json()['data'][0]['code'])
+        return (r.json()['data'][0]['id'], r.json()['data'][0]['code'])
     else:
         return None
+
+
 def get_code_by_name_and_parent_id(parent_id: int, name: str, level: int):
     r = get(_HEALTHY_CARD_QUERY_LOCATION_PATH, params={
         'fields': ['id', 'code'],
         'filter': json.dumps({
-            'level': { '_eq': level },
-            'name': {'_eq': name },
-            'parent_id': { '_eq': parent_id }
+            'level': {'_eq': level},
+            'name': {'_eq': name},
+            'parent_id': {'_eq': parent_id}
         })
     })
     if r.status_code != 200:
         return None
     if len(r.json()['data']) > 0:
-        return (r.json()['data'][0]['id'] ,r.json()['data'][0]['code'])
+        return (r.json()['data'][0]['id'], r.json()['data'][0]['code'])
     else:
         return None
+
 
 class Card:
     _HEALTHY_CARD_PRESET_DICT_PATH = 'https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryEmp.biz.ext'
     _HEALTHY_CARD_POST_PATH = 'https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.portalone.base.db.saveOrUpdate.biz.ext'
     _HEALTHY_CARD_QUERY_TODAY_PATH = 'https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryToday.biz.ext'
+
     def __init__(self, session):
         self._SESSION = session
 
-        self.get_user_info()  # 获取用户个人信息
-        self._load_preset()  # 加载表单预设
+        user_info_dict = self.get_user_info()  # 获取用户个人信息
+        preset_dict = self._load_preset()  # 加载表单预设
+
+        dict_merge = {**user_info_dict, **preset_dict}
+        print(dict_merge)
+
+        post_dict_need_csv = self._create_post_dict(dict_merge)
+
+        print('post_dict_need_csv')
+        print(post_dict_need_csv)
+
+        # for dev, show key need add to csv
+        # for k, v in post_dict_need_csv.items():
+        #     if v is None:
+        #         print(k)
+
+        self.form_dict = post_dict_need_csv
 
     def _load_preset(self):
+        # load user data from last commit
+
         r = self._SESSION.post(self._HEALTHY_CARD_PRESET_DICT_PATH)
 
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
 
-        print(resp_dict)
+        result = resp_dict.get('result', None)
+        print(result)
 
-        self._CLASS_NAME = resp_dict['result']['bjmc']  # 班级名称 '计算机学院xxxx级xx班'
-        self._COUNSELOR_ID = resp_dict['result']['fdygh']  # 辅导员工号
-        self._COUNSELOR_NAME = resp_dict['result']['fdymc']  # 辅导员名称
-        self._STUDENT_PHONE = os.environ.get('PHONE') or resp_dict['result']['lxdh']  # 学生联系电话
-        self._STUDENT_GRADE = resp_dict['result']['nj']  # 学生入学学年 第xxxx届学生
-        self._USER_TYPE = resp_dict['result']['qq']  # 人员身份? 2
-        self._DORM_ID = resp_dict['result']['ssh']  # 宿舍号 '榕x-xxx-x'
-        self._GENDER = resp_dict['result']['xb']  # 性别ID: 男 1 | 女 2
-        self._MAJOR = resp_dict['result']['zymc']  # 专业名称 '软件工程'
-        self._LOCATION = os.environ.get('LOCATION') or "广东省珠海市金湾区"
-        self._LOCATION_TYPE = os.environ.get('LOCATION_TYPE') or '2'  # 所在地区: 珠海1 | 在广东2 | 其他地区4 Todo: 使用环境变量
-        self._LOCATION_RESIDENT = os.environ.get('LOCATION_RESIDENT') or '广东省珠海市金湾区珠海科技学院'  # 常住地址 Todo: 上移到init
-        self._LOCATION_DETAILED = os.environ.get('LOCATION_DETAILED') or '广东省珠海市金湾区珠海科技学院'  # 具体地址
-        self._PROVINCE = os.environ.get('PROVINCE') or self._LOCATION[0:3]
-        self._CITY = os.environ.get('CITY') or self._LOCATION[3:6]
-        self._COUNTY = os.environ.get('COUNTY') or self._LOCATION[6:9]
-        province_id, province_code = get_code_from_name(self._PROVINCE, 1)
-        self._PROVINCE_CODE = province_code 
-        city_id, city_code = get_code_by_name_and_parent_id(province_id, self._CITY, 2)
-        self._CITY_CODE = city_code
-        county_id, county_code = get_code_by_name_and_parent_id(city_id, self._COUNTY, 3)
-        self._COUNTY_CODE = county_code
+        return result
 
-    def submit(self):
-        # 构建提交表单的参数
-        post_dict = {
-            'sqrid': self._USER_ID,
-            'sqbmid': self._ORG_ID,
-            'fdygh': self._COUNSELOR_ID,
-            'rysf': self._USER_TYPE,
-            'bt': f'{self._get_fmt_date()} {self._USER_REAL_NAME} 健康卡填报',  # 标题
-            'sqrmc': self._USER_REAL_NAME,
-            "gh": self._USER_STUDENT_ID,
-            "xb": self._GENDER,
-            "sqbmmc": self._ORG_NAME,
-            "nj": self._STUDENT_GRADE,
-            "zymc": self._MAJOR,
-            "bjmc": self._CLASS_NAME,
-            "fdymc": self._COUNSELOR_NAME,
-            "ssh": self._DORM_ID,
-            "lxdh": self._STUDENT_PHONE,
+    def _create_post_dict(self, user_data):
+        data =  {
+            'sqrid': user_data['empid'],
+            'sqbmid': user_data['orgid'],
+            'fdygh': None,
+            'rysf': user_data['qq'],  # 学生
+            'bt': f'{self._get_fmt_date()} {user_data["empname"]} 健康卡填报',  # 标题
+            'sqrmc': user_data['empname'],
+            "gh": user_data['empcode'],
+            "xb": None,
+            "sqbmmc": user_data['orgname'],
+            "nj": None,
+            "zymc": None,
+            "bjmc": None,
+            "fdymc": None,
+            "ssh": None,
+            "lxdh": None,  # self._STUDENT_PHONE,
             "tbrq": self._get_fmt_date(),
             "tjsj": self._get_fmt_date_time(),
-            "xjzdz": self._LOCATION_RESIDENT,
-            "jqqx": self._LOCATION,  # 假期期间去向 Todo: 上移到init
-            "pname": self._PROVINCE,
-            "cname": self._CITY,
-            "dname": self._COUNTY,
-            "pcode": self._PROVINCE_CODE,
-            "ccode": self._CITY_CODE,
-            "dcode": self._COUNTY_CODE,
-            # 健康设定
-            "ymjzqk": "已完成两针接种",
+            "xjzdz": None,
+            "jqqx": None,  # 假期期间去向 Todo: 上移到init
             "sfqwhb": "否",  # 去往湖北
-            "sfjchbjry": "否",
             "sfjwhy": "否",
             "sfjwhygjdq": "",
-            "xrywz": self._LOCATION_TYPE,
-            "jtdz": self._LOCATION_DETAILED,
+            "xrywz": None,  # self._LOCATION_TYPE,
+            "pcode": None,  # self._PROVINCE_CODE,
+            "ccode": None,  # self._CITY_CODE,
+            "dcode": None,  # self._COUNTY_CODE,
+            "jtdz": None,  # self._LOCATION_DETAILED,
             "grjkzk": "1",  # 健康码
             "jrtw": "36",  # 体温
+            "hsjcsj": None,  # self.VACCINATION_DATE,  # 最后接种日期 "2022-03-30"
+            "ymjzqk": "已完成三针接种",
+            "ymjzqkyy": "",
             "qsjkzk": "1",  # 亲属状况
             "jkqk": "1",  # 其他症状
             "cn": [
@@ -119,31 +118,56 @@ class Card:
             ],  # 承诺
             "bz": "无",  # 备注
             "_ext": "{}",
+            "sfgx": "1",
+            "pname": None,  # self._PROVINCE,  # 省
+            "cname": None,  # self._CITY,  # 市
+            "dname": None,  # self._COUNTY,  # 区
             "__type": "sdo:com.sudytech.work.jlzh.jkxxtb.jkxxcj.TJlzhJkxxtb"
         }
+
+        for k, v in data.items():
+            if v is None:
+                data[k] = user_data.get(k, None)
+        return data
+
+    def submit(self, csv_data: dict):
+        # load data from csv, if did not exist in preset post dict
+
+        for k, v in self.form_dict.items():
+            if v is None:
+                self.form_dict[k] = csv_data.get(k, None)
 
         # 如果今天填过健康卡，附带一个实体ID，更新实体
         today_submit_id = self._get_today_submit_id()
 
         if today_submit_id:
-            post_dict['id'] = today_submit_id
+            self.form_dict['id'] = today_submit_id
 
-        print("---- POST CARD DICT ----")
-        print(post_dict)
-
-        self._SESSION.post(self._HEALTHY_CARD_POST_PATH, json={'entity': post_dict})
+        print("---- POSTING CARD DICT ----")
+        print(self.form_dict)
+        self._SESSION.post(self._HEALTHY_CARD_POST_PATH, json={'entity': self.form_dict})
+        print("---- FINISH CARD DICT POST")
 
     def get_user_info(self):
         r = self._SESSION.get(
             'https://work.zcst.edu.cn/default/base/workflow/com.sudytech.work.jluzh_LoginUser.jluzhLogin.LoginUser.jluzhUtil.biz.ext')
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
         print(resp_dict)
+        # WARN: this dict key need to lower case
 
-        self._USER_ID = str(resp_dict['result']['EMPID'])  # 用户ID
-        self._ORG_ID = str(resp_dict['result']['ORGID'])  # 应该是学院ID
-        self._ORG_NAME = resp_dict['result']['ORGNAME']  # 学院名称
-        self._USER_REAL_NAME = resp_dict['result']['EMPNAME']  # 用户真实姓名
-        self._USER_STUDENT_ID = resp_dict['result']['EMPCODE']  # 用户学号
+        user_dict_upper = resp_dict.get('result', None)
+
+        print(user_dict_upper)
+
+        user_dict_lower = {}
+
+        if user_dict_upper:
+            for k, v in user_dict_upper.items():
+                user_dict_lower[k.lower()] = v
+
+        print(user_dict_lower)
+
+        return user_dict_lower
 
     def _get_today_submit_id(self):
         try:
