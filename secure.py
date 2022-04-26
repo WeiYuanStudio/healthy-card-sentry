@@ -1,3 +1,5 @@
+import json
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -59,6 +61,10 @@ class Secure:
         """Test login"""
         if self.session is None:
             print("Call login() first")
-            return
+            return False
         r = self.session.get("https://work.zcst.edu.cn/default/work/jlzh/jkxxtb/com.sudytech.work.jlzh.jkxxtb.jkxxcj.queryEmp.biz.ext")
-        print(r.content)
+        try:
+            resp_dict = json.loads(r.content.decode(encoding='utf-8'))
+            return True
+        except Exception as e:
+            return False

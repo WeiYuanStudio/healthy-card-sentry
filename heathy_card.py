@@ -1,5 +1,5 @@
 import json
-import os
+import logging
 from datetime import datetime, timezone, timedelta
 from requests import get
 
@@ -47,38 +47,34 @@ class Card:
     def __init__(self, session):
         self._SESSION = session
 
-        user_info_dict = self.get_user_info()  # 获取用户个人信息
+        user_info_dict = self._get_user_info()  # 获取用户个人信息
         preset_dict = self._load_preset()  # 加载表单预设
 
-        dict_merge = {**user_info_dict, **preset_dict}
-        print(dict_merge)
+        logging.info('merge 2 dict')
+        dict_merge = {**user_info_dict, **preset_dict}  # user info merge form preset
+        logging.info(dict_merge)
 
         post_dict_need_csv = self._create_post_dict(dict_merge)
 
-        print('post_dict_need_csv')
-        print(post_dict_need_csv)
+        logging.info('create post dict with merge dict')
+        logging.info(post_dict_need_csv)
 
-        # for dev, show key need add to csv
-        # for k, v in post_dict_need_csv.items():
-        #     if v is None:
-        #         print(k)
-
-        self.form_dict = post_dict_need_csv
+        self.form_dict = post_dict_need_csv  # form dict need csv data
 
     def _load_preset(self):
-        # load user data from last commit
+        logging.info('load user data from last commit')
 
         r = self._SESSION.post(self._HEALTHY_CARD_PRESET_DICT_PATH)
 
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
 
         result = resp_dict.get('result', None)
-        print(result)
+        logging.info(result)
 
         return result
 
     def _create_post_dict(self, user_data):
-        data =  {
+        data = {
             'sqrid': user_data['empid'],
             'sqbmid': user_data['orgid'],
             'fdygh': None,
@@ -143,21 +139,23 @@ class Card:
         if today_submit_id:
             self.form_dict['id'] = today_submit_id
 
-        print("---- POSTING CARD DICT ----")
-        print(self.form_dict)
+        logging.info("posting card")
+        logging.info(self.form_dict)
         self._SESSION.post(self._HEALTHY_CARD_POST_PATH, json={'entity': self.form_dict})
-        print("---- FINISH CARD DICT POST")
+        logging.info("posted card success")
 
-    def get_user_info(self):
+    def _get_user_info(self):
+        logging.info('get user info')
+
         r = self._SESSION.get(
             'https://work.zcst.edu.cn/default/base/workflow/com.sudytech.work.jluzh_LoginUser.jluzhLogin.LoginUser.jluzhUtil.biz.ext')
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
-        print(resp_dict)
-        # WARN: this dict key need to lower case
+        logging.info(resp_dict)
 
+        # WARN: this dict key need to lower case
         user_dict_upper = resp_dict.get('result', None)
 
-        print(user_dict_upper)
+        logging.info(user_dict_upper)
 
         user_dict_lower = {}
 
@@ -165,7 +163,8 @@ class Card:
             for k, v in user_dict_upper.items():
                 user_dict_lower[k.lower()] = v
 
-        print(user_dict_lower)
+        logging.info('trans user info to lower case')
+        logging.info(user_dict_lower)
 
         return user_dict_lower
 
@@ -184,8 +183,8 @@ class Card:
     def _get_today_submit(self):
         r = self._SESSION.post(self._HEALTHY_CARD_QUERY_TODAY_PATH)
         resp_dict = json.loads(r.content.decode(encoding='utf-8'))
-        print('TODAY SUBMIT')
-        print(resp_dict)
+        logging.info('TODAY SUBMIT')
+        logging.info(resp_dict)
         return {
             'TODAY_SUBMIT_ID': resp_dict['result'].get('ID', None),
             'TODAY_SUBMIT_TIME': resp_dict['result'].get('TJSJ', 'UNKNOWN')
