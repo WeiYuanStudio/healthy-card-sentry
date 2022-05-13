@@ -13,9 +13,10 @@
 简单说明：
 1. 自行安装青龙面板到服务器
 2. 使用`ql repo https://gitee.com/WeiYuanStudio/healthy-card-sentry.git`命令拉取该脚本
-3. 复制`user_data.csv.template`，并重命名为`user_data.csv`，自行补全该文件内打卡信息，一个人一行
-4. 拉取完毕后，删除面板自动导入的那几个该项目的任务。
-5. 自行添加任务，任务命令为`task WeiYuanStudio_healthy-card-sentry/index.py`，定时规则推荐`0 * * * *`（一小时一次打卡）
+3. 在面板内的依赖管理安装Python依赖`bs4`，若遇到失败也可以自行在容器内或者服务器内安装python的`bs4`依赖
+4. 复制`user_data.csv.template`，并重命名为`user_data.csv`，自行补全该文件内打卡信息，一个人一行
+5. 拉取完毕后，删除面板自动导入的那几个该项目的任务。
+6. 自行添加任务，任务命令为`task WeiYuanStudio_healthy-card-sentry/index.py`，定时规则推荐`0 * * * *`（一小时一次打卡）
 
 关于user_data.csv
 |描述|csv 头|
