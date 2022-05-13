@@ -1,6 +1,6 @@
-# ZCST(JLUZH) Healthy Card Sentry - Serverless
+# ZCST(JLUZH) Healthy Card Sentry - qinglong
 
-健康卡自动打卡(云函数)
+健康卡自动打卡(兼容青龙面板)
 
 ## 声明
 
