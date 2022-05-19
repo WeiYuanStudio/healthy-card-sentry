@@ -1,8 +1,7 @@
 import csv
 import logging
 
-from requests import Session
-
+from ModSession import ModSession
 from secure import Secure
 from heathy_card import Card
 from notify import Notify
@@ -22,7 +21,7 @@ def main_handler(event, context):
         logging.info('read csv finished, start execute all user')
         for csv_dict in user_data_csv:
             try:
-                with Session() as session:
+                with ModSession() as session:
                     session.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2)'}  # 设置UA避免被防火墙拦截
                     logging.info(f'start trying login user:{csv_dict["login_id"]}')
                     login_state = Secure(csv_dict['login_id'], csv_dict['login_pwd'], session).login().test()
